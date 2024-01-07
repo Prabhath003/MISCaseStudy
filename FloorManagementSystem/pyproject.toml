@@ -1,0 +1,23 @@
+[project]
+name = "floor-management-system"
+version = "1.0.0"
+description = "Intelligent Floor Plan Management System for a Seamless Workspace Experience."
+readme = "README.md"
+requires-python = ">=3.10.12"
+dependencies = ["flask>=3.0.0", "celery[redis]>=5.3.6"]
+
+[build-system]
+# The build-system section contains information about the build system used to build the project.
+# In this case, we are using flit, a simple Python packaging tool.
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.module]
+# The tool.flit.module section contains information about the Python module that is being built.
+# In this case, the name attribute is set to "task_app".
+name = "task_app"
+
+[tool.ruff]
+# The tool.ruff section contains information about the Ruff configuration file.
+# In this case, the src attribute is set to a list containing the "src" directory.
+src = ["src"]

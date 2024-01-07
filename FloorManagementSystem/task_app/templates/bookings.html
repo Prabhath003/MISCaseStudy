@@ -1,0 +1,193 @@
+{% extends "base.html" %} {%block title %} Booking {% endblock %}
+
+{% block content %}
+
+<div class="section">
+    <div class="section-center">
+        <div class="container">
+            <div class="row">
+                <div class="booking-form">
+                    <div class="form-header">
+                        <h1>Make your reservation</h1>
+                    </div>
+                    <form id=booking method=post class="needs-validation" novalidate>
+                        <div class="form-group"> <input name="purpose" class="form-control" type="text"
+                                placeholder="I want to have a meeting"> <span class="form-label">Purpose</span> </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group"> <input name="start" class="form-control" type="time" required>
+                                    <span class="form-label">From</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group"> <input name="end" class="form-control" type="time" required>
+                                    <span class="form-label">To</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group"> <input id='roomid' name="roomid" class="form-control"
+                                        type="text" placeholder="Chose from below" readonly> <span
+                                        class="form-label">Room ID</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group"> <input id='date' name="date" class="form-control" type="date"
+                                        required>
+                                    <span class="form-label">Date</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group"> <input name="count" class="form-control" type="number"
+                                        placeholder="Number of People" required> <span class="form-label">People</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="form-btn col-md-6">
+                            <form id="book" action="{{ url_for(" tasks.book") }}" method="post">
+                                <button id="book_btn" class="btn btn-primary">Book Now</button>
+                            </form>
+                        </div>
+                        <div class="form-btn col-md-3">
+                            <form id="search" action="{{ url_for(" tasks.search") }}" method="post">
+                                <button id="search_btn" class="btn btn-primary">Search</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p id=block-result></p>
+<table id="example" class="display" width="100%"></table>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+    function changeElementValue(elementId, newValue) {
+        // Get a reference to the element using its ID
+        const element = document.getElementById(elementId);
+
+        // Check if the element exists before attempting to change its value
+        if (element) {
+            // Set the element's value to the new value
+            element.value = newValue;
+        } else {
+            // Handle the case where the element is not found
+            console.error(`Element with ID "${elementId}" not found.`);
+        }
+    }
+
+
+    const taskForm = (formName, doPoll, report) => {
+        document.forms[formName].addEventListener("submit", (event) => {
+            let dataForm = document.getElementById("booking");
+            event.preventDefault()
+            if (!dataForm.checkValidity()) {
+                console.log(dataForm.checkValidity())
+                document.getElementById("booking").classList.add('was-validated')
+                return;
+            }
+            console.log(document.getElementById("roomid").value)
+            if (formName == 'book') {
+                if (document.getElementById("roomid").value == '') {
+                    console.log(dataForm.checkValidity())
+                    document.getElementById("booking").classList.add('was-validated')
+                    const el = document.getElementById("block-result")
+                    el.innerText = "Please select a RoomID"
+                    return;
+                }
+            }
+            fetch(event.target.action, {
+                method: "POST",
+                body: new FormData(dataForm)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    report(null)
+
+                    const poll = () => {
+                        fetch(`/result/${data["result_id"]}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                report(data)
+
+                                if (!data["ready"]) {
+                                    setTimeout(poll, 500)
+                                } else if (!data["successful"]) {
+                                    console.error(formName, data)
+                                }
+                            })
+                    }
+
+                    if (doPoll) {
+                        poll()
+                    }
+                })
+        })
+    }
+
+    taskForm("book", false, data => {
+        document.getElementById("block-result").innerText = (
+            "Request finished, Check your Activity for status updates or cancellation"
+        )
+    })
+
+    taskForm("search", true, data => {
+        const el = document.getElementById("block-result")
+
+        if (data === null) {
+            el.innerText = "submitted"
+        } else if (!data["ready"]) {
+            el.innerText = "waiting"
+        } else if (!data["successful"]) {
+            el.innerText = "error, check console"
+        } else {
+            var dataSet = data["value"]
+            // console.log(dataSet)
+            // dataSet = [[1, "2", "3", "4", '5', `<button class="btn-primary" onclick="changeElementValue('roomid', 1)">Choose</button>`]]
+
+
+            new DataTable('#example', {
+                columns: [
+                    { title: 'Room ID' },
+                    { title: 'Capacity' },
+                    { title: 'Floor ID' },
+                    { title: 'Type' },
+                    { title: "Equipment" },
+                    { title: "" }
+                ],
+                data: dataSet
+            });
+        }
+    })
+</script>
+{% endblock %}

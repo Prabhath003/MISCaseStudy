@@ -1,0 +1,70 @@
+{% extends "base.html" %} {%block title %} Activity {% endblock %}
+
+{% block content %}
+<h1>Your Bookings</h1>
+<p id=block-result></p>
+<table id="example" class="display" width="100%"></table>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    var js = '{{ booklist | tojson }}'
+    var dataSet = JSON.parse(js);
+
+    for (let i = 0; i < dataSet.length; i++) {
+        dataSet[i][5] = dataSet[i][5].replaceAll("'{", '"{')
+        dataSet[i][5] = dataSet[i][5].replaceAll("}'", '}"')
+    }
+
+    new DataTable('#example', {
+        columns: [
+            { title: 'Booking ID' },
+            { title: 'Room ID' },
+            { title: 'People Count' },
+            { title: 'From' },
+            { title: "To" },
+            { title: "" }
+        ],
+        data: dataSet
+    });
+
+    const taskForm = (formName, doPoll, report) => {
+        document.forms[formName].addEventListener("submit", (event) => {
+            event.preventDefault()
+            fetch(event.target.action, {
+                method: "POST",
+                body: new FormData(event.target)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    report(null)
+
+                    const poll = () => {
+                        fetch(`/tasks/result/${data["result_id"]}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                report(data)
+
+                                if (!data["ready"]) {
+                                    setTimeout(poll, 500)
+                                } else if (!data["successful"]) {
+                                    console.error(formName, data)
+                                }
+                            })
+                    }
+
+                    if (doPoll) {
+                        poll()
+                    }
+                })
+        })
+    }
+
+    taskForm("block", false, data => {
+        document.getElementById("block-result").innerText = (
+            "Request Submitted"
+        )
+    })
+
+</script>
+{% endblock %}

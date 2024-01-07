@@ -1,0 +1,181 @@
+{% extends "base.html" %} {%block title %} workspaces {% endblock %}
+
+{% block content %}
+<div class="container p-3 mb-2 bg-info text-white">
+    <h1>Buildings</h1>
+    <form action="/createbuilding" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
+                    </th>
+                    <th scope="col"><label for="address" class="form-label">Address</label>
+                        <input type="text" class="form-control" id="address" name="address" placeholder="Enter Address"
+                            required>
+                    </th>
+                    <th scope="col"><button id="create" class="btn btn-primary">Create</button></th>
+                </tr>
+            </thead>
+        </table>
+    </form>
+    <p id=block-result></p>
+    <table id="buildings" class="display" width="100%"></table>
+</div>
+
+<div class="container p-3 mb-2 bg-secondary text-white">
+    <h1>Floor Plans</h1>
+    <form action="/createFloor" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><label for="buildingId" class="form-label">Buidling ID</label>
+                        <input type="number" class="form-control" id="buildingId" name="buildingId"
+                            placeholder="Enter Buidling ID" required>
+                    </th>
+                    <th scope="col"><label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
+                    </th>
+                    <th scope="col"><label for="level" class="form-label">Level</label>
+                        <input type="number" class="form-control" id="level" name="level" default="0"
+                            placeholder="Enter Level" required>
+                    </th>
+                    <th scope="col"><label for="image" class="form-label">Map Link</label>
+                        <input type="text" class="form-control" id="image" name="image" default="0"
+                            placeholder="Enter Map Link" required>
+                    </th>
+                    <th scope="col"><button id="create" class="btn btn-primary">Create</button></th>
+                </tr>
+            </thead>
+        </table>
+    </form>
+    <p id=block-result></p>
+    <table id="floors" class="display" width="100%"></table>
+</div>
+
+<div class="container p-3 mb-2 bg-info text-white">
+    <h1>Rooms</h1>
+    <form action="/createRoom" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><label for="floor_plan_id" class="form-label">Floor Plan ID</label>
+                        <input type="number" class="form-control" id="floor_plan_id" name="floor_plan_id"
+                            placeholder="Enter Floor Plan ID" required>
+                    </th>
+                    <th scope="col"><label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Enter Name" required>
+                    </th>
+                    <th scope="col"><label for="type" class="form-label">Type</label>
+                        <input type="text" class="form-control" id="type" name="type" placeholder="Enter Type" required>
+                    </th>
+                    <th scope="col"><label for="capacity" class="form-label">Capacity</label>
+                        <input type="number" class="form-control" id="capacity" name="capacity"
+                            placeholder="Enter Capacity" required>
+                    </th>
+                    <th scope="col"><label for="equipment" class="form-label">Equipment</label>
+                        <input type="text" class="form-control" id="equipment" name="equipment"
+                            placeholder="Enter Equipment" required>
+                    </th>
+                    <th scope="col"><button id="create" class="btn btn-primary">Create</button></th>
+                </tr>
+            </thead>
+        </table>
+    </form>
+    <p id=block-result></p>
+    <table id="rooms" class="display" width="100%"></table>
+</div>
+
+<div class="container p-3 mb-2 bg-secondary text-white">
+    <h1>Seats</h1>
+    <form action="/createSeat" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col"><label for="room_id" class="form-label">Room ID</label>
+                        <input type="number" class="form-control" id="room_id" name="room_id"
+                            placeholder="Enter Room ID" required>
+                    </th>
+                    <th scope="col"><label for="label" class="form-label">Label</label>
+                        <input type="text" class="form-control" id="label" name="label" placeholder="Enter Label"
+                            required>
+                    </th>
+                    <th scope="col"><button id="create" class="btn btn-primary">Create</button></th>
+                </tr>
+            </thead>
+        </table>
+    </form>
+    <p id=block-result></p>
+    <table id="seats" class="display" width="100%"></table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script>
+
+    var js = '{{ buildingS | tojson }}'
+    var buildings = JSON.parse(js);
+    console.log(buildings)
+
+    new DataTable('#buildings', {
+        columns: [
+            { title: 'ID' },
+            { title: 'Name' },
+            { title: 'Address' },
+            { title: "" }
+        ],
+        data: buildings
+    });
+
+    var js = '{{ floorS | tojson }}'
+    var floors = JSON.parse(js);
+    console.log(floors)
+
+    new DataTable('#floors', {
+        columns: [
+            { title: 'ID' },
+            { title: 'Building ID' },
+            { title: 'Name' },
+            { title: 'Level' },
+            { title: "Map Link" },
+            { title: "Created At" },
+            { title: "Updated At" },
+            { title: "" }
+        ],
+        data: floors
+    });
+
+
+    var js = '{{ roomS | tojson }}'
+    var rooms = JSON.parse(js);
+    console.log(rooms)
+    // rooms = []
+
+    new DataTable('#rooms', {
+        columns: [
+            { title: 'ID' },
+            { title: 'Floor Plan ID' },
+            { title: 'Name' },
+            { title: 'Type' },
+            { title: "Capacity" },
+            { title: "Equipment" },
+            { title: "" }
+        ],
+        data: rooms
+    });
+
+    var js = '{{ seatS | tojson }}'
+    var seats = JSON.parse(js);
+    console.log(seats)
+
+    new DataTable('#seats', {
+        columns: [
+            { title: 'ID' },
+            { title: 'Room ID' },
+            { title: 'Label' },
+            { title: "" }
+        ],
+        data: seats
+    });
+</script>
+{% endblock %}
