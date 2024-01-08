@@ -24,7 +24,7 @@
 
 # Implementation - FMS (Floor Management System)
 ## Features Implemented
-- Designed a database scheme with:
+- Designed a database schema with:
     - Designed such that easily modifiable and extentable
     - CASCADING such indpendent child entries entries will be deleted along with parent entries, for example, `Floors and Rooms are also removed along with Building`
     - Implemented pre-checks before uploading child entries such that blocking when no parent entry exists, for example, `There can't be floor without Building`
@@ -34,10 +34,19 @@
 
 - Implemented neat, impressive and secure website with `authentication`
 - Added a `Your Activity` Page to `cancel the booking` previously done.
+![Your Activity Page](Pictures/yourActivity.png)
 - Added a `Reservation Page` to Book the rooms.
+![Reservation page](Pictures/BookingPage.png)
 - Running the database on `celery` such that requests can be populated over `flask`, which will whenever the `celery server is up`
 - A interactive `workspace page` to add and delete the floor plans, building, rooms and seats.
+![Workspace page](Pictures/WorkspaceGen.png)
 
+## Tools Used:
+1. Flask
+2. Celery
+3. Python
+
+## Demo: [Google Drive](https://drive.google.com/file/d/1RhvacrvaRIy3znLYo8hhaWwoxM9yUIiV/view?usp=sharing)
 
 # Running the WebApp - FMS
 Its better you create `virtualenv` to run the project.

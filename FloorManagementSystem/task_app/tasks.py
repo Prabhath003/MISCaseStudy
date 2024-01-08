@@ -50,9 +50,9 @@ def search(From, To, date, People):
             and_(
             Room.capacity >= People,  # Filter for rooms with at least 5 seats
             # Check for closed bookings within the desired time frame
-            or_(Room.id != Booking.room_id, Booking.status != 'open',
-                and_(Booking.start_time >= To,
-                    Booking.end_time <= From))
+            # or_(Room.id != Booking.room_id, Booking.status != 'open',
+            #     and_(Booking.start_time >= To,
+            #         Booking.end_time <= From))
             )).all()
 
     rooms = []
