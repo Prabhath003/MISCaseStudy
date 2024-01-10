@@ -49,12 +49,12 @@
                     </form>
                     <div class="row">
                         <div class="form-btn col-md-6">
-                            <form id="book" action="{{ url_for(" tasks.book") }}" method="post">
+                            <form id="book" action="{{ url_for("tasks.book") }}" method="post">
                                 <button id="book_btn" class="btn btn-primary">Book Now</button>
                             </form>
                         </div>
                         <div class="form-btn col-md-3">
-                            <form id="search" action="{{ url_for(" tasks.search") }}" method="post">
+                            <form id="search" action="{{ url_for("tasks.search") }}" method="post">
                                 <button id="search_btn" class="btn btn-primary">Search</button>
                             </form>
                         </div>
@@ -66,6 +66,9 @@
 </div>
 
 <p id=block-result></p>
+<div id="searchTable" class="container">
+    <table id="example" class="display" width="100%"></table>
+</div>
 <table id="example" class="display" width="100%"></table>
 
 <script src="https://code.jquery.com/jquery-3.7.0.js" crossorigin="anonymous"></script>
@@ -125,6 +128,10 @@
                     el.innerText = "Please select a RoomID"
                     return;
                 }
+                document.getElementById("searchTable").innerHTML = "<table id='example' class='display' width='100%'></table>"
+            }
+            if (formName == 'search') {
+                document.getElementById("searchTable").innerHTML = "<table id='example' class='display' width='100%'></table>"
             }
             fetch(event.target.action, {
                 method: "POST",
@@ -159,6 +166,7 @@
         document.getElementById("block-result").innerText = (
             "Request finished, Check your Activity for status updates or cancellation"
         )
+        changeElementValue('roomid', "")
     })
 
     taskForm("search", true, data => {
@@ -172,6 +180,7 @@
             el.innerText = "error, check console"
         } else {
             var dataSet = data["value"]
+            el.innerText = ""
             // console.log(dataSet)
             // dataSet = [[1, "2", "3", "4", '5', `<button class="btn-primary" onclick="changeElementValue('roomid', 1)">Choose</button>`]]
 

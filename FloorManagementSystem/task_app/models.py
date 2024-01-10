@@ -74,7 +74,7 @@ class Room(db.Model):
     capacity = Column(Integer)
     equipment = Column(String)
     seats = relationship("Seat", backref="room", cascade="all, delete-orphan")
-    bookings = relationship("Booking", backref="room", cascade="all, delete-orphan")
+    bookings = relationship("Booking", backref="room")
 
 
 class Seat(db.Model):
@@ -151,7 +151,7 @@ class Booking(db.Model):
         db.UniqueConstraint('room_id', 'user_id', 'start_time', 'end_time'),
       )
     id = Column(Integer, primary_key=True)
-    room_id = Column(Integer, ForeignKey('rooms.id', ondelete='CASCADE'))
+    room_id = Column(Integer, ForeignKey('rooms.id'))
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'))
     people_count = Column(Integer, default=1)
     start_time = Column(DateTime(timezone=True), server_default=func.now())

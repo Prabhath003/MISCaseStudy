@@ -1,5 +1,5 @@
 from celery import shared_task
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, not_
 from datetime import datetime
 
 from . import db
@@ -46,19 +46,21 @@ def search(From, To, date, People):
     From = datetime(date[0], date[1], date[2], From[0], From[1])
     To = datetime(date[0], date[1], date[2], To[0], To[1])
 
-    available_rooms = db.session.query(Room, Booking).outerjoin(Booking, Booking.room_id == Room.id).filter(
-            and_(
-            Room.capacity >= People,  # Filter for rooms with at least 5 seats
-            # Check for closed bookings within the desired time frame
-            # or_(Room.id != Booking.room_id, Booking.status != 'open',
-            #     and_(Booking.start_time >= To,
-            #         Booking.end_time <= From))
-            )).all()
-
+    available_rooms = db.session.query(Room).filter(
+        and_(
+            Room.capacity >= People,
+            Room.id.notin_(
+                db.session.query(Booking.room_id).filter(
+                    Booking.status == 'open',
+                    not_(or_(
+                        Booking.start_time >= To,
+                        Booking.end_time <= From
+                    )))))).all()
+    
     rooms = []
     for i in available_rooms:
-        html = f"""<button class="btn btn-primary" onclick="changeElementValue('roomid', {i[0].id})">Choose</button>"""
-        rooms.append([i[0].id, str(i[0].capacity), str(i[0].floor_plan_id), str(i[0].type), str(i[0].equipment), html])
+        html = f"""<button class="btn btn-primary" onclick="changeElementValue('roomid', {i.id})">Choose</button>"""
+        rooms.append([i.id, str(i.capacity), str(i.floor_plan_id), str(i.type), str(i.equipment), html])
 
     return rooms
 
@@ -79,7 +81,7 @@ Returns:
 
 """
 @shared_task(Bind=True, ignore_result=True)
-def book(purpose, From, To, RoomID, date, People, id):
+def bookRoom(purpose, From, To, RoomID, date, People, id):
 
     date = list(map(int, date.split('-')))
     From = list(map(int, From.split(':')))
