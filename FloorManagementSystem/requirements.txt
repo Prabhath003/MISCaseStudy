@@ -21,7 +21,7 @@ geometry-msgs==4.2.3
 greenlet==3.0.3
 interactive-markers==2.3.2
 itsdangerous==2.1.2
-Jinja2==3.1.2
+Jinja2==3.1.6
 kombu==5.3.4
 laser-geometry==2.4.0
 logging-demo==0.20.3
@@ -83,4 +83,4 @@ unique-identifier-msgs==2.2.1
 vine==5.1.0
 visualization-msgs==4.2.3
 wcwidth==0.2.13
-Werkzeug==3.0.1
+Werkzeug==3.1.6
